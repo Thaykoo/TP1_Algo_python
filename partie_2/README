@@ -1,0 +1,40 @@
+# Mini-Projet : Gestion de Bibliothèque Numérique - Partie 2 : Organisation et Optimisation
+
+## Objectif de la Partie 2
+
+Remplacer la structure de données de base (liste Python) par un **Arbre Binaire de Recherche (BST)** pour améliorer l'efficacité de la recherche et maintenir l'ordre des documents de manière dynamique.
+
+## ⚙️ Implémentation du BST
+
+Le BST est implémenté dans le fichier `bst.py` via deux classes :
+* **`Node`** : Représente un nœud dans l'arbre, stockant l'objet `Document` et les références vers les fils gauche (`left`) et droit (`right`).
+* **`BinarySearchTree`** : Gère la racine de l'arbre et implémente les méthodes de manipulation.
+
+### 1. Insertion de Documents
+
+* **Méthode :** `BST.insert(document)`
+* **Principe :** L'insertion est effectuée de manière récursive en comparant le titre du nouveau document avec celui des nœuds existants. Si le nouveau titre est **inférieur** au nœud courant, il est inséré dans le sous-arbre **gauche** ; sinon, il est inséré dans le sous-arbre **droit**.
+* **Complexité :** $O(\log n)$ en moyenne (pour un arbre équilibré). $O(n)$ dans le pire cas (arbre dégénéré en liste).
+
+### 2. Recherche de Documents
+
+* **Méthode :** `BST.search(titre)`
+* **Principe :** La recherche est également récursive et suit la même logique de comparaison que l'insertion.
+* **Complexité :** $O(\log n)$ en moyenne. **C'est le gain majeur par rapport à la Recherche Séquentielle ($O(n)$) de la Partie 1.**
+
+### 3. Parcours In-order
+
+* **Méthode :** `BST.in_order_traversal()`
+* **Principe :** Le parcours suit l'ordre : **Gauche** $\rightarrow$ **Racine** $\rightarrow$ **Droite**.
+* **Résultat :** Le parcours in-order garantit que les documents sont affichés dans l'ordre alphabétique de leurs titres, exploitant ainsi la propriété intrinsèque du BST.
+
+## 📊 Comparaison des Performances de Recherche
+
+La fonction `comparer_recherche_performance()` est implémentée pour valider le gain théorique apporté par le BST.
+
+* **Recherche Séquentielle (Partie 1) :** $O(n)$
+    * Dans une liste de taille $N$, il faut en moyenne $N/2$ comparaisons pour trouver un élément. Le temps d'exécution augmente **linéairement** avec $N$.
+* **Recherche BST (Partie 2) :** $O(\log n)$
+    * Dans un BST de taille $N$, le nombre de comparaisons est proportionnel à la hauteur de l'arbre. Le temps d'exécution augmente **logarithmiquement**, ce qui est beaucoup plus rapide pour de très grands $N$.
+
+**Résultat Attendu :** La comparaison démontrera que la recherche sur le BST est **plusieurs centaines de fois plus rapide** que la recherche séquentielle pour un grand volume de documents, confirmant que le choix du BST est adapté pour l'optimisation des requêtes de recherche.

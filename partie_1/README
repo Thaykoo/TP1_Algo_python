@@ -1,0 +1,61 @@
+# Mini-Projet : Gestion de Bibliothèque Numérique - Partie 1 : Fondations
+
+## Objectif de la Partie 1
+
+Cette partie établit les fondations du système en utilisant les structures de données de base de Python (classe `Document`, liste `list`) et en implémentant des algorithmes fondamentaux de tri et de recherche.
+
+## 🏗️ Architecture du Code
+
+Le code est structuré de manière modulaire :
+* `main.py` (à la racine) : Le point d'entrée et le menu principal.
+* **partie_1/** : Le paquetage contenant la logique.
+    * `__init__.py` : Expose les classes et fonctions pour un import propre.
+    * `document.py` : Définit la classe `Document` (Titre, Auteur, Mots-clés).
+    * `gestionnaire.py` : Contient les fonctions de gestion et les algorithmes de base.
+    * `supplement_algo.py` : Contient l'algorithme de tri optimisé et la fonction de comparaison des performances.
+
+## 💾 Structure des Données
+
+La collection de documents est gérée par une **liste Python standard (`list`)**. Chaque élément est un objet de la classe `Document`.
+
+## ⚙️ Choix des Algorithmes de Base
+
+### 1. Algorithme de Tri : Tri par Insertion (Insertion Sort)
+
+| Fonction | `gestionnaire.trier_par_titre()` |
+| :--- | :--- |
+| **Complexité** | $O(n^2)$ |
+| **Clé de Tri** | Titre du document (non sensible à la casse). |
+
+**Justification du choix :** C'est un algorithme facile à comprendre et simple à implémenter, idéal pour illustrer les bases du tri par comparaison lors de la phase de fondation.
+
+### 2. Algorithme de Recherche : Recherche Séquentielle (Linear Search)
+
+| Fonction | `gestionnaire.rechercher_par_titre()` |
+| :--- | :--- |
+| **Complexité** | $O(n)$ |
+| **Critère de Recherche** | Titre du document (recherche exacte, non sensible à la casse). |
+
+**Justification du choix :** Il s'agit de l'approche la plus élémentaire. Il fonctionne sur n'importe quelle collection, qu'elle soit triée ou non, répondant ainsi à l'exigence du projet.
+
+---
+
+## ⭐️ SUPPLÉMENT BINÔME : Optimisation et Comparaison
+
+### 3. Algorithme de Tri Amélioré : Tri Fusion (Merge Sort)
+
+| Fichier | `supplement_algo.py` |
+| :--- | :--- |
+| **Complexité** | $O(n \log n)$ |
+| **Justification** | Le Tri Fusion utilise la stratégie « Diviser pour régner ». Sa complexité en $O(n \log n)$ garantit une **performance bien supérieure** à celle du Tri par Insertion, particulièrement lorsque la bibliothèque contient un grand nombre de documents. |
+
+### 4. Comparaison des Performances
+
+La fonction `comparer_temps_execution` (dans `supplement_algo.py`) permet de chronométrer l'exécution du Tri par Insertion ($O(n^2)$) et du Tri Fusion ($O(n \log n)$) sur des jeux de données de tailles croissantes.
+
+**Observation Attendue :** Les résultats démontrent clairement que le Tri Fusion est plus efficace pour la gestion de grandes collections, confirmant l'importance d'utiliser des algorithmes $O(n \log n)$ pour l'évolutivité.
+
+---
+## 🚀 Exécution
+
+Pour lancer le programme, assurez-vous d'être dans le dossier racine (`/MiniProjet_Bibliotheque`) et utilisez la commande : `python3 -m main`.
