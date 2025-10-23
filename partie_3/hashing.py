@@ -1,16 +1,11 @@
-# Fichier : partie_3/hashing.py
-# Implémentation d'une Table de Hachage pour l'indexation par Auteur (O(1)).
 
-import time      # <--- AJOUTER CET IMPORT
+import time
 import random
 from copy import deepcopy
 
-# --- Dépendance de la Partie 1 pour la structure ---
-# Nous supposons que la classe Document est accessible via l'import relatif
 try:
     from ..partie_1.document import Document
 except ImportError:
-    # Fallback pour le test si la structure de dossier est plate
     class Document:
         def __init__(self, titre, auteur="Inconnu", mots_cles=""):
             self.titre = titre
@@ -19,9 +14,6 @@ except ImportError:
         def __str__(self):
             return f"Titre: '{self.titre}' | Auteur: {self.auteur}"
 
-# ==============================================================================
-# 1. Classes Node et BinarySearchTree
-# ==============================================================================
 
 class Bucket:
     """Représente un seau (bucket) dans la table de hachage (gestion par chaînage)."""
@@ -56,9 +48,60 @@ class HashTable:
         
         resultats = []
         for doc in bucket.items:
-            if doc.auteur.lower() == key:
+            if key in doc.auteur.lower():
                 resultats.append(doc)
+        
+        if not resultats:
+            for bucket in self.table:
+                for doc in bucket.items:
+                    if key in doc.auteur.lower():
+                        resultats.append(doc)
                 
+        return resultats
+
+    def search_by_title(self, titre):
+        """
+        Recherche tous les documents par titre.
+        Complexité: O(n) car on doit parcourir tous les buckets.
+        """
+        resultats = []
+        for bucket in self.table:
+            for doc in bucket.items:
+                if titre.lower() in doc.titre.lower():
+                    resultats.append(doc)
+        return resultats
+
+    def search_by_keywords(self, mot_cle):
+        """
+        Recherche tous les documents par mots-clés.
+        Complexité: O(n) car on doit parcourir tous les buckets.
+        """
+        resultats = []
+        for bucket in self.table:
+            for doc in bucket.items:
+                for mot in doc.mots_cles:
+                    if mot_cle.lower() in mot.lower():
+                        resultats.append(doc)
+                        break
+        return resultats
+
+    def search_advanced(self, terme):
+        """
+        Recherche avancée dans tous les champs (titre, auteur, mots-clés).
+        Complexité: O(n) car on doit parcourir tous les buckets.
+        """
+        resultats = []
+        for bucket in self.table:
+            for doc in bucket.items:
+                if terme.lower() in doc.titre.lower():
+                    resultats.append(doc)
+                elif terme.lower() in doc.auteur.lower():
+                    resultats.append(doc)
+                else:
+                    for mot_cle in doc.mots_cles:
+                        if terme.lower() in mot_cle.lower():
+                            resultats.append(doc)
+                            break
         return resultats
         
     def populate_from_bst(self, bst):
@@ -70,9 +113,6 @@ class HashTable:
         for doc in documents:
             self.insert(doc)
 
-# ==============================================================================
-# Comparaison de performance O(n) vs O(1)
-# ==============================================================================
 
 def comparer_recherche_hachage(Document_Classe, list_size=10000, table_size=1000):
     """
@@ -83,28 +123,22 @@ def comparer_recherche_hachage(Document_Classe, list_size=10000, table_size=1000
     print(f"      Taille de l'échantillon : {list_size} documents")
     print("="*70)
 
-    # Création des données
     auteurs_uniques = [f"Auteur {i}" for i in range(100)]
     donnees = [Document_Classe(f"Titre-{i}", random.choice(auteurs_uniques), "") for i in range(list_size)]
     
-    # 1. Préparation des structures
     bibliotheque_list = donnees
     ht = HashTable(size=table_size)
     for doc in donnees:
         ht.insert(doc)
 
-    # Clés à rechercher
     auteurs_a_chercher = random.sample(auteurs_uniques, 10)
     
-    # --- Mesure de la Recherche Séquentielle (O(n)) ---
     start_time_seq = time.time()
     for auteur in auteurs_a_chercher:
-        # Recherche séquentielle dans la liste pour simuler P1
         [doc for doc in donnees if doc.auteur.lower() == auteur.lower()]
     end_time_seq = time.time()
     temps_sequentiel = (end_time_seq - start_time_seq) / len(auteurs_a_chercher)
     
-    # --- Mesure de la Recherche Hachage (O(1)) ---
     start_time_hash = time.time()
     for auteur in auteurs_a_chercher:
         ht.search_by_author(auteur)

@@ -1,16 +1,11 @@
-# Fichier : partie_2/bst.py
-# Implémentation de l'Arbre Binaire de Recherche (Binary Search Tree - BST)
 
 import time
 import random
 from copy import deepcopy
 
-# --- Dépendance de la Partie 1 pour la structure ---
-# Nous supposons que la classe Document est accessible via l'import relatif
 try:
     from ..partie_1.document import Document
 except ImportError:
-    # Fallback pour le test si la structure de dossier est plate
     class Document:
         def __init__(self, titre, auteur="Inconnu", mots_cles=""):
             self.titre = titre
@@ -19,16 +14,13 @@ except ImportError:
         def __str__(self):
             return f"Titre: '{self.titre}' | Auteur: {self.auteur}"
 
-# ==============================================================================
-# 1. Classes Node et BinarySearchTree
-# ==============================================================================
 
 class Node:
     """Représente un nœud dans l'Arbre Binaire de Recherche."""
     def __init__(self, document):
-        self.document = document  # Stocke l'objet Document
-        self.left = None          # Fils gauche
-        self.right = None         # Fils droit
+        self.document = document
+        self.left = None
+        self.right = None
 
 class BinarySearchTree:
     """Implémentation du BST pour stocker des documents triés par titre."""
@@ -36,9 +28,6 @@ class BinarySearchTree:
         self.root = None
         self.size = 0
 
-    # ----------------------------------------------------------------------
-    # 2. Insertion de Documents
-    # ----------------------------------------------------------------------
 
     def insert(self, document):
         """Insère un nouveau document dans l'arbre."""
@@ -49,7 +38,6 @@ class BinarySearchTree:
             self.root = self._insert_recursif(self.root, document)
 
     def _insert_recursif(self, current_node, document):
-        # La clé de tri est le titre, normalisé en minuscules pour la comparaison
         titre_cle = document.titre.lower()
         current_cle = current_node.document.titre.lower()
 
@@ -59,18 +47,15 @@ class BinarySearchTree:
                 self.size += 1
             else:
                 self._insert_recursif(current_node.left, document)
-        elif titre_cle >= current_cle: # Gère les titres identiques en les mettant à droite
+        elif titre_cle >= current_cle:
             if current_node.right is None:
                 current_node.right = Node(document)
                 self.size += 1
             else:
                 self._insert_recursif(current_node.right, document)
         
-        return current_node # Retourne le nœud courant (inutile pour Python mais bonne pratique)
+        return current_node
             
-    # ----------------------------------------------------------------------
-    # 3. Recherche de Documents
-    # ----------------------------------------------------------------------
 
     def search(self, titre):
         """Recherche un document par titre dans le BST."""
@@ -80,7 +65,7 @@ class BinarySearchTree:
     def _search_recursif(self, current_node, titre_cle):
         """Méthode de recherche récursive. Complexité : O(log n) en moyenne."""
         if current_node is None:
-            return None # Document non trouvé
+            return None
 
         current_cle = current_node.document.titre.lower()
 
@@ -88,12 +73,71 @@ class BinarySearchTree:
             return current_node.document
         elif titre_cle < current_cle:
             return self._search_recursif(current_node.left, titre_cle)
-        else: # titre_cle > current_cle
+        else:
             return self._search_recursif(current_node.right, titre_cle)
 
-    # ----------------------------------------------------------------------
-    # 4. Parcours In-order
-    # ----------------------------------------------------------------------
+    def search_by_author(self, auteur):
+        """Recherche tous les documents d'un auteur dans le BST."""
+        resultats = []
+        self._search_by_author_recursif(self.root, auteur.lower(), resultats)
+        return resultats
+
+    def _search_by_author_recursif(self, current_node, auteur_cle, resultats):
+        """Recherche récursive par auteur. Complexité : O(n) car on doit parcourir tout l'arbre."""
+        if current_node is None:
+            return
+
+        if auteur_cle in current_node.document.auteur.lower():
+            resultats.append(current_node.document)
+
+        self._search_by_author_recursif(current_node.left, auteur_cle, resultats)
+        self._search_by_author_recursif(current_node.right, auteur_cle, resultats)
+
+    def search_by_keywords(self, mot_cle):
+        """Recherche tous les documents contenant un mot-clé dans le BST."""
+        resultats = []
+        self._search_by_keywords_recursif(self.root, mot_cle.lower(), resultats)
+        return resultats
+
+    def _search_by_keywords_recursif(self, current_node, mot_cle, resultats):
+        """Recherche récursive par mots-clés. Complexité : O(n) car on doit parcourir tout l'arbre."""
+        if current_node is None:
+            return
+
+        for mot in current_node.document.mots_cles:
+            if mot_cle in mot.lower():
+                resultats.append(current_node.document)
+                break
+
+        self._search_by_keywords_recursif(current_node.left, mot_cle, resultats)
+        self._search_by_keywords_recursif(current_node.right, mot_cle, resultats)
+
+    def search_advanced(self, terme):
+        """Recherche avancée dans tous les champs (titre, auteur, mots-clés)."""
+        resultats = []
+        self._search_advanced_recursif(self.root, terme.lower(), resultats)
+        return resultats
+
+    def _search_advanced_recursif(self, current_node, terme, resultats):
+        """Recherche avancée récursive. Complexité : O(n) car on doit parcourir tout l'arbre."""
+        if current_node is None:
+            return
+
+        document = current_node.document
+        
+        if terme in document.titre.lower():
+            resultats.append(document)
+        elif terme in document.auteur.lower():
+            resultats.append(document)
+        else:
+            for mot_cle in document.mots_cles:
+                if terme in mot_cle.lower():
+                    resultats.append(document)
+                    break
+
+        self._search_advanced_recursif(current_node.left, terme, resultats)
+        self._search_advanced_recursif(current_node.right, terme, resultats)
+
 
     def in_order_traversal(self):
         """Effectue un parcours in-order et retourne la liste des documents triés."""
@@ -108,9 +152,6 @@ class BinarySearchTree:
             resultats.append(node.document)
             self._in_order_recursif(node.right, resultats)
             
-    # ----------------------------------------------------------------------
-    # 5. Suppression de Documents (Ajout demandé)
-    # ----------------------------------------------------------------------
 
     def delete(self, titre):
         """Supprime un document par titre de l'arbre."""
@@ -120,8 +161,8 @@ class BinarySearchTree:
         self.root = self._delete_recursif(self.root, titre_cle)
         
         if self.size < original_size:
-            return True # Suppression réussie
-        return False # Document non trouvé
+            return True
+        return False
 
     def _delete_recursif(self, node, titre_cle):
         if node is None:
@@ -129,15 +170,12 @@ class BinarySearchTree:
 
         current_cle = node.document.titre.lower()
 
-        # 1. Parcourir pour trouver le nœud
         if titre_cle < current_cle:
             node.left = self._delete_recursif(node.left, titre_cle)
         elif titre_cle > current_cle:
             node.right = self._delete_recursif(node.right, titre_cle)
         else:
-            # 2. Le nœud à supprimer est trouvé
             
-            # Cas 1 : Nœud avec au plus un enfant
             if node.left is None:
                 self.size -= 1
                 return node.right
@@ -145,14 +183,10 @@ class BinarySearchTree:
                 self.size -= 1
                 return node.left
 
-            # Cas 2 : Nœud avec deux enfants
-            # Trouver le successeur immédiat (le plus petit dans le sous-arbre droit)
             temp = self._trouver_min_node(node.right)
             
-            # Remplacer le contenu du nœud courant par celui du successeur
             node.document = temp.document
             
-            # Supprimer le successeur (le size est décrémenté dans l'appel récursif)
             node.right = self._delete_recursif(node.right, temp.document.titre.lower())
             
         return node
@@ -164,9 +198,6 @@ class BinarySearchTree:
             current = current.left
         return current
         
-# ==============================================================================
-# 6. Comparaison des Performances de Recherche (Reste inchangé)
-# ==============================================================================
 
 def recherche_sequentielle(bibliotheque_list, titre_cle):
     """
@@ -188,29 +219,23 @@ def comparer_recherche_performance(Document_Classe, list_size=10000):
     print(f"        Taille de l'échantillon : {list_size} documents")
     print("="*70)
 
-    # --- Préparation des Données ---
     titres_uniques = [f"Titre-{i}" for i in range(list_size)]
     random.shuffle(titres_uniques)
     donnees = [Document_Classe(titre, "Auteur", "") for titre in titres_uniques]
 
-    # Construction des structures
-    bibliotheque_list = donnees # La liste
+    bibliotheque_list = donnees
     bst = BinarySearchTree()
     for doc in donnees:
         bst.insert(doc)
 
-    # Titres à rechercher (pour un test équitable)
-    # On choisit 100 titres aléatoires parmi les existants
     titres_a_chercher = random.sample(titres_uniques, 100) 
     
-    # --- Mesure de la Recherche Séquentielle (O(n)) ---
     start_time_seq = time.time()
     for titre in titres_a_chercher:
         recherche_sequentielle(bibliotheque_list, titre)
     end_time_seq = time.time()
     temps_sequentiel = (end_time_seq - start_time_seq) / len(titres_a_chercher)
     
-    # --- Mesure de la Recherche BST (O(log n)) ---
     start_time_bst = time.time()
     for titre in titres_a_chercher:
         bst.search(titre)
